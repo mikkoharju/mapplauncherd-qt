@@ -26,6 +26,7 @@
 class MDeclarativeCache;
 class QGuiApplication;
 class QQuickView;
+class QQmlEngine;
 
 class MDeclarativeCachePrivate
 {
@@ -42,6 +43,7 @@ public:
     static const int ARGV_LIMIT;
     QGuiApplication *qApplicationInstance;
     QQuickView *qQuickViewInstance;
+    QQmlEngine *qQmlEngine;
     int initialArgc;
     char **initialArgv;
     QString appDirPath;

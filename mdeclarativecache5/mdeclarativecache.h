@@ -26,6 +26,7 @@
 class MDeclarativeCachePrivate;
 class QGuiApplication;
 class QQuickView;
+class QQmlEngine;
 
 /*!
  * \class MDeclarativeCache.
@@ -75,6 +76,8 @@ public:
      * not working on harmattan with qdeclarativebooster and Qt 4.7, but this has been fixed.
      */
     static QString applicationFilePath() __attribute__ ((deprecated));
+
+    static void setQQmlEngine(QQmlEngine *engine);
 
 protected:
 

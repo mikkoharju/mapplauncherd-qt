@@ -18,6 +18,7 @@
 ****************************************************************************/
 
 #include <QQuickView>
+#include <QQmlEngine>
 #include <QtPlugin>
 #include <QPluginLoader>
 #include <QLibraryInfo>
@@ -38,6 +39,7 @@ const int MDeclarativeCachePrivate::ARGV_LIMIT = 32;
 MDeclarativeCachePrivate::MDeclarativeCachePrivate() :
     qApplicationInstance(0),
     qQuickViewInstance(0),
+    qQmlEngine(0),
     initialArgc(ARGV_LIMIT),
     initialArgv(new char* [initialArgc]),
     appDirPath(QString()),
@@ -78,8 +80,10 @@ void MDeclarativeCachePrivate::populate()
         qApplicationInstance = new QGuiApplication(initialArgc, initialArgv);
     }
 
-    qQuickViewInstance = new QQuickView();
-
+    if (qQmlEngine)
+        qQuickViewInstance = new QQuickView(qQmlEngine, 0);
+    else
+        qQuickViewInstance = new QQuickView;
 }
 
 QGuiApplication *MDeclarativeCachePrivate::qApplication(int &argc, char **argv)
@@ -182,8 +186,14 @@ QQuickView *MDeclarativeCachePrivate::qQuickView()
     if (qQuickViewInstance != 0) {
         returnValue = qQuickViewInstance;
         qQuickViewInstance = 0;
-    } else
-        returnValue = new QQuickView;
+    } else if (qQmlEngine)
+            returnValue = new QQuickView(qQmlEngine, 0);
+        else
+            returnValue = new QQuickView;
+
+    // Give ownership of the engine to the created quickview
+    if (qQmlEngine)
+        qQmlEngine->setParent(returnValue);
 
     return returnValue;
 }
@@ -232,5 +242,10 @@ QString MDeclarativeCache::applicationDirPath()
 QString MDeclarativeCache::applicationFilePath()
 {
     return d_ptr->applicationFilePath();
+}
+
+void MDeclarativeCache::setQQmlEngine(QQmlEngine *engine)
+{
+    d_ptr->qQmlEngine = engine;
 }
 
